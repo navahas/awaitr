@@ -18,10 +18,10 @@ const BRIGHT_YELLOW: &str = "\x1b[38;2;240;223;174m";
 
 const HIDE_CURSOR: &str = "\x1B[?25l";
 const SHOW_CURSOR: &str = "\x1B[?25h";
-const FPS: u64 = 218;
+const FPMS: u64 = 218;
 
-fn fps() {
-    sleep(Duration::from_millis(FPS));
+fn fpms() {
+    sleep(Duration::from_millis(FPMS));
 }
 
 fn word_loader(word: &str, color: &str, h_color: &str, frame: usize) -> String {
@@ -85,7 +85,7 @@ fn dummy_progress() {
             width = 11
         );
 
-        fps();
+        fpms();
     }
     println!("{SHOW_CURSOR}");
 }
