@@ -18,7 +18,7 @@ const BRIGHT_YELLOW: &str = "\x1b[38;2;240;223;174m";
 
 const HIDE_CURSOR: &str = "\x1B[?25l";
 const SHOW_CURSOR: &str = "\x1B[?25h";
-const FPMS: u64 = 150;
+const FPMS: u64 = 218;
 
 fn fpms() {
     sleep(Duration::from_millis(FPMS));
@@ -75,26 +75,26 @@ fn cast_loader(spinner: String, word: String) {
 }
 
 fn dummy_progress() {
-    let tasks = 1000;
+    let tasks = 2000;
 
     let default_spinner = " ·•✤✻✶✼✽❃✹✺✹❇✶✻✤•·•✤❈❉❊✤✻✼✽❃✶✺✹❇❈❉❊✤•· ";
     let spinner_a = "⣾⣽⣻⢿⡿⣟⣯⣷";
     let spinner_b = " ▏▎▍▌▋▊▉▉▉▉▉▊▊▋▌▍▎";
-    let spinner_c = " ▁▂▃▄▅▆▇████▇▇▆▅▄▃▁ ";
+    let spinner_c = " ▁▂▃▄▅▆▇████▇▆▅▅▆▇█████▇▆▅▅▆▇████▇▆▅▄▃▂▁";
 
     println!("{HIDE_CURSOR}");
     for t in 0..tasks {
         let rustifying = word_loader("Rustifying…", RED, BRIGHT_RED, t);
-        let s_rustifying = spinner_loader(default_spinner, RED, t / 2);
+        let s_rustifying = spinner_loader(default_spinner, RED, t * 2);
 
         let compiling = word_loader("Compiling…", GREEN, BRIGHT_GREEN, t);
-        let s_compiling = spinner_loader(spinner_a, GREEN, t / 2);
+        let s_compiling = spinner_loader(spinner_a, GREEN, t / 3);
 
         let borrowchecking = word_loader("Borrowchecking…", BLUE, BRIGHT_BLUE, t);
-        let s_borrowchecking = spinner_loader(spinner_b, BLUE, t / 2);
+        let s_borrowchecking = spinner_loader(spinner_b, BLUE, t);
 
         let working = word_loader("Working…", YELLOW, BRIGHT_YELLOW, t);
-        let s_working = spinner_loader(spinner_c, YELLOW, t / 2);
+        let s_working = spinner_loader(spinner_c, YELLOW, t * 2);
 
         println!("{}", CLEAR);
 
