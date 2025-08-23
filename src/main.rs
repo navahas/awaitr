@@ -18,19 +18,25 @@ const BRIGHT_YELLOW: &str = "\x1b[38;2;240;223;174m";
 
 const HIDE_CURSOR: &str = "\x1B[?25l";
 const SHOW_CURSOR: &str = "\x1B[?25h";
-const FPMS: u64 = 218;
+const FPMS: u64 = 150;
 
 fn fpms() {
     sleep(Duration::from_millis(FPMS));
 }
 
-fn word_loader(word: &str, color: &str, h_color: &str, frame: usize) -> String {
-    let w_position = frame % word.len();
-    let range = 2;
+fn word_loader(word: &str, color: &str, h_color: &str, mut frame: usize) -> String {
+    if frame < 10 {
+        return format!("{color}{word}");
+    };
+
+    frame -= 10;
+    let w_chars: Vec<char> = word.chars().collect();
+    let w_position = frame % w_chars.len();
+    let range = 3;
     let w_range = w_position + range;
 
-    let end_bound = if w_range > word.len() {
-        word.len()
+    let end_bound = if w_range > w_chars.len() {
+        w_chars.len()
     } else {
         w_range
     };
@@ -41,16 +47,15 @@ fn word_loader(word: &str, color: &str, h_color: &str, frame: usize) -> String {
         let r = word.chars().skip(1).collect::<String>();
         (m, r)
     } else {
-        let m = word.chars()
+        let m = word
+            .chars()
             .skip(w_position)
             .take(range)
             .collect::<String>();
         let r = word.chars().skip(end_bound).collect::<String>();
         (m, r)
     };
-    let word_frame = format!(
-        "{color}{left}{h_color}{BOLD}{mid}{REGULAR}{color}{right}"
-    );
+    let word_frame = format!("{color}{left}{h_color}{BOLD}{mid}{REGULAR}{color}{right}");
     //let word_frame = format!(
     //    "{w_position} {left} {mid} -{color}{left}{h_color}{BOLD}{mid}{REGULAR}{color}{right}"
     //);
@@ -70,7 +75,7 @@ fn cast_loader(spinner: String, word: String) {
 }
 
 fn dummy_progress() {
-    let tasks = 100;
+    let tasks = 1000;
 
     let default_spinner = " ·•✤✻✶✼✽❃✹✺✹❇✶✻✤•·•✤❈❉❊✤✻✼✽❃✶✺✹❇❈❉❊✤•· ";
     let spinner_a = "⣾⣽⣻⢿⡿⣟⣯⣷";
@@ -80,16 +85,16 @@ fn dummy_progress() {
     println!("{HIDE_CURSOR}");
     for t in 0..tasks {
         let rustifying = word_loader("Rustifying…", RED, BRIGHT_RED, t);
-        let s_rustifying = spinner_loader(default_spinner, RED, t);
+        let s_rustifying = spinner_loader(default_spinner, RED, t / 2);
 
         let compiling = word_loader("Compiling…", GREEN, BRIGHT_GREEN, t);
-        let s_compiling = spinner_loader(spinner_a, GREEN, t);
+        let s_compiling = spinner_loader(spinner_a, GREEN, t / 2);
 
         let borrowchecking = word_loader("Borrowchecking…", BLUE, BRIGHT_BLUE, t);
-        let s_borrowchecking = spinner_loader(spinner_b, BLUE, t);
+        let s_borrowchecking = spinner_loader(spinner_b, BLUE, t / 2);
 
         let working = word_loader("Working…", YELLOW, BRIGHT_YELLOW, t);
-        let s_working = spinner_loader(spinner_c, YELLOW, t);
+        let s_working = spinner_loader(spinner_c, YELLOW, t / 2);
 
         println!("{}", CLEAR);
 
