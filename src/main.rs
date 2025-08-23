@@ -25,13 +25,35 @@ fn fpms() {
 }
 
 fn word_loader(word: &str, color: &str, h_color: &str, frame: usize) -> String {
-    let word_chars: Vec<char> = word.chars().collect();
-    let word_len = word_chars.len();
-    let w_position = frame % word_len;
-    let left: String = word.chars().take(w_position).collect();
-    let mid = word_chars[w_position];
-    let right: String = word.chars().skip(w_position + 1).collect();
-    let word_frame = format!("{color}{left}{h_color}{BOLD}{mid}{REGULAR}{color}{right}");
+    let w_position = frame % word.len();
+    let range = 2;
+    let w_range = w_position + range;
+
+    let end_bound = if w_range > word.len() {
+        word.len()
+    } else {
+        w_range
+    };
+
+    let left = word.chars().take(w_position).collect::<String>();
+    let (mid, right) = if w_position == 0 {
+        let m = word.chars().take(1).collect::<String>();
+        let r = word.chars().skip(1).collect::<String>();
+        (m, r)
+    } else {
+        let m = word.chars()
+            .skip(w_position)
+            .take(range)
+            .collect::<String>();
+        let r = word.chars().skip(end_bound).collect::<String>();
+        (m, r)
+    };
+    let word_frame = format!(
+        "{color}{left}{h_color}{BOLD}{mid}{REGULAR}{color}{right}"
+    );
+    //let word_frame = format!(
+    //    "{w_position} {left} {mid} -{color}{left}{h_color}{BOLD}{mid}{REGULAR}{color}{right}"
+    //);
     word_frame
 }
 
@@ -52,8 +74,8 @@ fn dummy_progress() {
 
     let default_spinner = " ·•✤✻✶✼✽❃✹✺✹❇✶✻✤•·•✤❈❉❊✤✻✼✽❃✶✺✹❇❈❉❊✤•· ";
     let spinner_a = "⣾⣽⣻⢿⡿⣟⣯⣷";
-    let spinner_b = " ▏▎▍▌▋▊▉▉▊▋▌▍▎";
-    let spinner_c = " ▁▂▃▄▅▆▇█▇▆▅▄▃▁ ";
+    let spinner_b = " ▏▎▍▌▋▊▉▉▉▉▉▊▊▋▌▍▎";
+    let spinner_c = " ▁▂▃▄▅▆▇████▇▇▆▅▄▃▁ ";
 
     println!("{HIDE_CURSOR}");
     for t in 0..tasks {
