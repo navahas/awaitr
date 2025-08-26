@@ -18,60 +18,45 @@ const BRIGHT_YELLOW: &str = "\x1b[38;2;240;223;174m";
 
 const HIDE_CURSOR: &str = "\x1B[?25l";
 const SHOW_CURSOR: &str = "\x1B[?25h";
-//const FPMS: u64 = 218;
-const FPMS: u64 = 1000;
+const FPMS: u64 = 218;
 
 fn fpms() {
     sleep(Duration::from_millis(FPMS));
 }
 
 fn word_loader(word: &str, color: &str, h_color: &str, mut frame: usize) -> String {
-    if frame < 10 {
+    if frame < 10 || word.chars().count() == 0 {
         return format!("{color}{word}");
-    };
-
+    }
     frame -= 10;
-    let w_chars: Vec<char> = word.chars().collect();
-    let w_position = frame % w_chars.len();
-    let range = 2;
-    let w_range = w_position + range;
 
-    let end_bound = if w_range > w_chars.len() {
-        w_chars.len()
+    let m_range: usize = 3;
+
+    // pad with m_range spaces so the snake can fully fade out off the right edge.
+    let s_word = format!("{word}{}", " ".repeat(m_range));
+    let word_len = word.chars().count();
+    let len = s_word.chars().count();
+
+    let head = frame * 2 % len;
+
+    let end = (head + 1).min(word_len);
+    let start = if head + 1 >= m_range {
+        head + 1 - m_range
     } else {
-        w_range
+        0
     };
 
-    let (left, mid, right) = match w_position {
-        0 => {
-            let l = word.chars().take(0).collect::<String>();
-            let m = word.chars().take(1).collect::<String>();
-            let r = word.chars().skip(1).collect::<String>();
-            (l, m, r)
-        }
-        1 => {
-            let l = word.chars().take(0).collect::<String>();
-            let m = word.chars().take(2).collect::<String>();
-            let r = word.chars().skip(2).collect::<String>();
-            (l, m, r)
-        }
-        _ => {
-            let l = word.chars().take(w_position - 1).collect::<String>();
-            let m = word
-                .chars()
-                .skip(w_position - 1)
-                .take(range)
-                .collect::<String>();
-            let r = word.chars().skip(end_bound - 1).collect::<String>();
-            (l, m, r)
-        }
-    };
+    // might no be strictly needed
+    // for window empty (we're entirely in padding), show the plain word
+    if start >= end {
+        return format!("{color}{word}");
+    }
 
-    let word_frame = format!("{color}{left}{h_color}{BOLD}{mid}{REGULAR}{color}{right}");
-    //let word_frame = format!(
-    //    "{w_position} {left} {mid} -{color}{left}{h_color}{BOLD}{mid}{REGULAR}{color}{right}"
-    //);
-    word_frame
+    let left: String = word.chars().take(start).collect();
+    let mid: String = word.chars().skip(start).take(end - start).collect();
+    let right: String = word.chars().skip(end).collect();
+
+    format!("{color}{left}{h_color}{BOLD}{mid}{REGULAR}{color}{right}")
 }
 
 fn spinner_loader(icons: &str, color: &str, frame: usize) -> String {
