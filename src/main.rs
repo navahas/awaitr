@@ -18,7 +18,8 @@ const BRIGHT_YELLOW: &str = "\x1b[38;2;240;223;174m";
 
 const HIDE_CURSOR: &str = "\x1B[?25l";
 const SHOW_CURSOR: &str = "\x1B[?25h";
-const FPMS: u64 = 218;
+//const FPMS: u64 = 218;
+const FPMS: u64 = 1000;
 
 fn fpms() {
     sleep(Duration::from_millis(FPMS));
@@ -32,7 +33,7 @@ fn word_loader(word: &str, color: &str, h_color: &str, mut frame: usize) -> Stri
     frame -= 10;
     let w_chars: Vec<char> = word.chars().collect();
     let w_position = frame % w_chars.len();
-    let range = 3;
+    let range = 2;
     let w_range = w_position + range;
 
     let end_bound = if w_range > w_chars.len() {
@@ -41,20 +42,31 @@ fn word_loader(word: &str, color: &str, h_color: &str, mut frame: usize) -> Stri
         w_range
     };
 
-    let left = word.chars().take(w_position).collect::<String>();
-    let (mid, right) = if w_position == 0 {
-        let m = word.chars().take(1).collect::<String>();
-        let r = word.chars().skip(1).collect::<String>();
-        (m, r)
-    } else {
-        let m = word
-            .chars()
-            .skip(w_position)
-            .take(range)
-            .collect::<String>();
-        let r = word.chars().skip(end_bound).collect::<String>();
-        (m, r)
+    let (left, mid, right) = match w_position {
+        0 => {
+            let l = word.chars().take(0).collect::<String>();
+            let m = word.chars().take(1).collect::<String>();
+            let r = word.chars().skip(1).collect::<String>();
+            (l, m, r)
+        }
+        1 => {
+            let l = word.chars().take(0).collect::<String>();
+            let m = word.chars().take(2).collect::<String>();
+            let r = word.chars().skip(2).collect::<String>();
+            (l, m, r)
+        }
+        _ => {
+            let l = word.chars().take(w_position - 1).collect::<String>();
+            let m = word
+                .chars()
+                .skip(w_position - 1)
+                .take(range)
+                .collect::<String>();
+            let r = word.chars().skip(end_bound - 1).collect::<String>();
+            (l, m, r)
+        }
     };
+
     let word_frame = format!("{color}{left}{h_color}{BOLD}{mid}{REGULAR}{color}{right}");
     //let word_frame = format!(
     //    "{w_position} {left} {mid} -{color}{left}{h_color}{BOLD}{mid}{REGULAR}{color}{right}"
@@ -85,7 +97,7 @@ fn dummy_progress() {
     println!("{HIDE_CURSOR}");
     for t in 0..tasks {
         let rustifying = word_loader("Rustifying…", RED, BRIGHT_RED, t);
-        let s_rustifying = spinner_loader(default_spinner, RED, t * 2);
+        let s_rustifying = spinner_loader(default_spinner, RED, t * 5);
 
         let compiling = word_loader("Compiling…", GREEN, BRIGHT_GREEN, t);
         let s_compiling = spinner_loader(spinner_a, GREEN, t / 3);
